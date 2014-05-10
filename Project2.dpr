@@ -15,8 +15,6 @@ var
 procedure Init();
 begin
   DParams := TDictionary<string, string>.Create();
-  DParams.Add('хелп', 'введён параметр хелп');
-  DParams.Add('север', 'введён параметр север');
 end;
 
 procedure &Final();
@@ -24,20 +22,33 @@ begin
   FreeAndNil(DParams);
 end;
 
-function GetInfo(const ParamName: string; out Info: string): Boolean;
+//function GetParamValue(const ParamName: string; out Info: string): Boolean;
+//begin
+//  Result := DParams.ContainsKey(ParamName);
+//  if Result then
+//    Info := DParams[ParamName];
+//end;
+
+function AddParam(const Param: string): Boolean;
+var
+  SplitParam : TArray<string>;
 begin
-  Result := DParams.ContainsKey(ParamName);
+  SplitParam := Param.Split(['=']);
+  Result := Length(SplitParam) > 1;
   if Result then
-    Info := DParams[ParamName];
+    with DParams do
+    begin
+      if not ContainsKey(SplitParam[0]) then
+        Add(SplitParam[0], SplitParam[1]);
+    end;
 end;
 
-procedure Main();
+procedure ParseParams();
 var
   I       : Integer;
   ICount  : Integer;
   SParam  : string;
   CFirst  : PChar;
-  SInfo   : string;
 begin
   ICount := ParamCount;
   if ICount > 0 then
@@ -51,10 +62,7 @@ begin
             if CFirst^.IsInArray(['-']) then
               begin
                 Inc(CFirst);
-                if GetInfo(string(CFirst), SInfo) then
-                  Writeln(SInfo)
-                else
-                  Writeln(string(CFirst) + ' параметр не найден');
+                AddParam(string(CFirst));
               end
             else
               Writeln('параметр должен начинаться с -');
@@ -67,11 +75,24 @@ begin
     Writeln('запуск без параметров');
 end;
 
+procedure WriteParams();
+var
+  Item  : TPair<string, string>;
+begin
+  if DParams.Count > 0 then
+    for Item in DParams do
+      Writeln(Item.Key + ' = ' + Item.Value)
+  else
+    Writeln('параметров нет');
+end;
+
 begin
   Init();
   try
     try
-      Main();
+      ParseParams();
+      Writeln(StringOfChar('=', 79));
+      WriteParams();
     except
       on E: Exception do
         Writeln(E.ClassName, ': ', E.Message);
