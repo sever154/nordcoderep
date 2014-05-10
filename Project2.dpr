@@ -10,7 +10,7 @@ uses
   System.SysUtils;
 
 var
-  DParams : TDictionary<string, string>;
+	DParams : TDictionary<string, string>;
 
 procedure Init();
 begin
@@ -21,13 +21,6 @@ procedure &Final();
 begin
   FreeAndNil(DParams);
 end;
-
-//function GetParamValue(const ParamName: string; out Info: string): Boolean;
-//begin
-//  Result := DParams.ContainsKey(ParamName);
-//  if Result then
-//    Info := DParams[ParamName];
-//end;
 
 function AddParam(const Param: string): Boolean;
 var
@@ -55,8 +48,8 @@ begin
     begin
       for I := 1 to ICount do
       begin
-        SParam := ParamStr(I).ToLower;
-        if not SParam.IsEmpty then
+        SParam := ParamStr(I).ToLower();
+        if not SParam.IsEmpty() then
           begin
             CFirst := @SParam[1];
             if CFirst^.IsInArray(['-']) then
